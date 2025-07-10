@@ -5,4 +5,4 @@ from core.serializers import CorretorSerializer
 
 class CorretorViewSet(ModelViewSet):
     queryset = Corretor.objects.all()
-    serializer_class = CorretorSerializer
+    serializer_class = CorretorSerializer   
