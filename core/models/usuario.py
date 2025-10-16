@@ -1,7 +1,7 @@
 from django.db import models
 
 class Usuario(models.Model):
-    email = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
     cpf = models.IntegerField(default=0)
     senha = models.CharField(max_length=100)
     datanasc = models.DateField(max_length=100)
