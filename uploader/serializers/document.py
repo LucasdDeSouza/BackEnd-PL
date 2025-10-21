@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from uploader.helpers.files import CONTENT_TYPE_PDF, get_content_type
+from uploader.helpers.files import CONTENT_TYPE_PDF, CONTENT_TYPE_GLB, get_content_type
 from uploader.models import Document
 
 
@@ -12,7 +12,7 @@ class DocumentUploadSerializer(serializers.ModelSerializer):
         extra_kwargs = {"file": {"write_only": True}}
 
     def validate_file(self, value):
-        valid_content_types = [CONTENT_TYPE_PDF]
+        valid_content_types = [CONTENT_TYPE_PDF, CONTENT_TYPE_GLB]
         if get_content_type(value) not in valid_content_types:
             raise serializers.ValidationError("Invalid or corrupted document.")
         return value
