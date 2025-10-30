@@ -1,5 +1,5 @@
 from django.db import models
-from uploader.models import Image
+from uploader.models import Image, Document
 from .proprietario import Proprietario
 
 class Propriedade(models.Model):
@@ -11,6 +11,14 @@ class Propriedade(models.Model):
     proprietario = models.ForeignKey(Proprietario, on_delete=models.PROTECT, related_name="proprietarios")
     capa = models.ForeignKey(
         Image,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    modelo_3d = models.ForeignKey(
+        Document,
         related_name='+',
         on_delete=models.SET_NULL,
         null=True,
