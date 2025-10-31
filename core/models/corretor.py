@@ -1,12 +1,12 @@
 from django.db import models
 
-from .usuario import Usuario
+from .user import User
 
 class Corretor(models.Model):
     cnpj = models.CharField(max_length=100)
     creci = models.CharField(max_length=100)
     telefone = models.CharField(max_length=100)
-    nome = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name="Usuarios")
+    nome = models.ForeignKey(User, on_delete=models.PROTECT, related_name="Usuarios")
 
 
     def __str__(self):

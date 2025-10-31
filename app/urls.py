@@ -12,7 +12,6 @@ from django.conf.urls.static import static
 from core.views import UserViewSet
 from core.views import PropriedadeViewSet
 from core.views import ProprietarioViewSet
-from core.views import UsuarioViewSet
 from core.views import CorretorViewSet
 from uploader.router import router as uploader_router
 
@@ -24,7 +23,6 @@ from rest_framework_simplejwt.views import (
 router = DefaultRouter()
 router.register(r"Propriedades", PropriedadeViewSet)
 router.register(r"Proprietarios", ProprietarioViewSet)
-router.register(r"Usuarios", UsuarioViewSet)
 router.register(r"Corretor", CorretorViewSet)
 router.register(r'usuarios', UserViewSet, basename='usuarios')
 
