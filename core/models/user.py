@@ -1,7 +1,4 @@
-"""
-Database models.
-"""
-
+import uuid
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -26,10 +23,9 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, **extra_fields)
 
         if password:
-            # Faz o hash da senha antes de salvar
-            user.password = make_password(password)
+            user.set_password(password)  # ✅ usa o método padrão do Django
         else:
-            user.set_unusable_password()  # evita senha vazia
+            user.set_unusable_password()
 
         user.save(using=self._db)
         return user
@@ -50,9 +46,10 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """User model in the system."""
 
-    passage_id = models.CharField(
-        max_length=255,
+    passage_id = models.UUIDField(
+        default=uuid.uuid4,
         unique=True,
+        editable=False,
         verbose_name=_('passage_id'),
         help_text=_('Passage ID'),
     )
@@ -89,3 +86,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
         db_table = 'user'
+
+    def save(self, *args, **kwargs):
+        """Garante que a senha seja sempre criptografada antes de salvar."""
+        if self.password and not self.password.startswith('pbkdf2_'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
+    def __str__(self):
+        """Retorna a representação em string do usuário."""
+        return self.email
