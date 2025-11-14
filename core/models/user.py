@@ -1,4 +1,7 @@
-import uuid
+"""
+Database models.
+"""
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -6,7 +9,6 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.hashers import make_password
 
 
 class UserManager(BaseUserManager):
@@ -19,57 +21,30 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address.')
 
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-
-        if password:
-            user.set_password(password)  # ✅ usa o método padrão do Django
-        else:
-            user.set_unusable_password()
-
+        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user.set_password(password)
         user.save(using=self._db)
+
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, password):
         """Create, save and return a new superuser."""
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        user = self.create_user(email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self.create_user(email, password, **extra_fields)
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User model in the system."""
 
-    passage_id = models.UUIDField(
-        default=uuid.uuid4,
-        unique=True,
-        editable=False,
-        verbose_name=_('passage_id'),
-        help_text=_('Passage ID'),
-    )
-    email = models.EmailField(
-        max_length=255,
-        unique=True,
-        verbose_name=_('email'),
-        help_text=_('Email'),
-    )
-    name = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name=_('name'),
-        help_text=_('Username'),
-    )
+    passage_id = models.CharField(max_length=255, unique=True, verbose_name=_('passage_id'), help_text=_('Passage ID'))
+    email = models.EmailField(max_length=255, unique=True, verbose_name=_('email'), help_text=_('Email'))
+    name = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('name'), help_text=_('Username'))
     is_active = models.BooleanField(
-        default=True,
-        verbose_name=_('Usuário está ativo'),
-        help_text=_('Indica que este usuário está ativo.'),
+        default=True, verbose_name=_('Usuário está ativo'), help_text=_('Indica que este usuário está ativo.')
     )
     is_staff = models.BooleanField(
         default=False,
@@ -83,15 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
+        """Meta options for the model."""
+
         verbose_name = 'Usuário'
         verbose_name_plural = 'Usuários'
-        db_table = 'user'
-
-    def save(self, *args, **kwargs):
-        """Garante que a senha seja sempre criptografada antes de salvar."""
-        if self.password and not self.password.startswith('pbkdf2_'):
-            self.password = make_password(self.password)
-        super().save(*args, **kwargs)
-    def __str__(self):
-        """Retorna a representação em string do usuário."""
-        return self.email
