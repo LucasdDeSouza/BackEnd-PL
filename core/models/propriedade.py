@@ -17,7 +17,6 @@ class Propriedade(models.Model):
         blank=True,
         default=None,
     )
-
     def __str__(self):
         return f"{self.id} - {self.endereco}"
 

@@ -1,0 +1,2 @@
+- [ ] Add multipart parsers to PropriedadeViewSet in core/views/propriedade.py
+- [ ] Modify PropriedadeSerializer in core/serializers/propriedade.py to include modelo_glb_file field and override create/update methods for direct GLB upload

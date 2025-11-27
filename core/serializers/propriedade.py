@@ -1,45 +1,33 @@
-
-from rest_framework.serializers import ModelSerializer
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
-
-
+from rest_framework import serializers
+from uploader.models import Image
 from core.models import Propriedade
 
-from uploader.models import Image, Document
-from uploader.serializers import ImageSerializer, DocumentSerializer
-
-class PropriedadeSerializer(ModelSerializer):
-    class Meta:
-        model = Propriedade
-        fields = "__all__"
-
-class PropriedadeRetrieveSerializer(ModelSerializer):
-    capa = ImageSerializer(required=False)
-    modelo_3d = DocumentSerializer(required=False)
+class PropriedadeSerializer(serializers.ModelSerializer):
+    capa_arquivo = serializers.ImageField(write_only=True, required=False)
 
     class Meta:
         model = Propriedade
-        fields = '__all__'
-        depth = 1
-...
-class PropriedadeSerializer(ModelSerializer):
-    capa_attachment_key = SlugRelatedField(
-        source='capa',
-        queryset=Image.objects.all(),
-        slug_field='attachment_key',
-        required=False,
-        write_only=True,
-    )
-    modelo_3d_attachment_key = SlugRelatedField(
-        source='modelo_3d',
-        queryset=Document.objects.all(),
-        slug_field='attachment_key',
-        required=False,
-        write_only=True,
-    )
-    capa = ImageSerializer(required=False, read_only=True)
-    modelo_3d = DocumentSerializer(required=False, read_only=True)
+        fields = [
+            "id",
+            "endereco",
+            "complemento",
+            "estado",
+            "cep",
+            "cidade",
+            "usuario",
+            "capa",
+            "capa_arquivo",
+        ]
+        read_only_fields = ["capa"]
 
-    class Meta:
-        model = Propriedade
-        fields = '__all__'
+    def create(self, validated_data):
+        imagem = validated_data.pop("capa_arquivo", None)
+
+        propriedade = Propriedade.objects.create(**validated_data)
+
+        if imagem:
+            img = Image.objects.create(file=imagem)
+            propriedade.capa = img
+            propriedade.save()
+
+        return propriedade
