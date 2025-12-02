@@ -5,6 +5,7 @@ CONTENT_TYPE_JPG = "image/jpeg"
 CONTENT_TYPE_PNG = "image/png"
 
 CONTENT_TYPE_PDF = "application/pdf"
+CONTENT_TYPE_GLB = "model/gltf-binary"
 
 
 def get_content_type(file):
